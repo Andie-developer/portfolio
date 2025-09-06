@@ -1,0 +1,15 @@
+{
+  "short_name": "Andani Tshidada",
+  "name": "Andani Tshidada - Full Stack Developer Portfolio",
+  "icons": [
+    {
+      "src": "favicon.svg?v=3",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
