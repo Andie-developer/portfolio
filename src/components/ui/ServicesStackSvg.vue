@@ -1,369 +1,469 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const isActive = ref(false)
+const pipelinePhase = ref(0)
+const phases = ['UI Request', 'API Logic', 'Data Store', 'Response']
 
-const steps = [
-  { id: 'fe', label: 'Front-End', desc: 'UI & experience' },
-  { id: 'be', label: 'Back-End', desc: 'Logic & APIs' },
-  { id: 'db', label: 'Database', desc: 'Store & retrieve' },
-]
+let interval = null
+
+onMounted(() => {
+  interval = setInterval(() => {
+    pipelinePhase.value = (pipelinePhase.value + 1) % phases.length
+  }, 2200)
+})
+
+onUnmounted(() => {
+  clearInterval(interval)
+})
+
+const uid = 'svc'
 </script>
 
 <template>
-  <div
-    class="stack-visual"
-    :class="{ 'stack-visual--active': isActive }"
-    tabindex="0"
-    role="img"
-    aria-label="Animated full stack: Front-End, Back-End, Database"
-    @mouseenter="isActive = true"
-    @mouseleave="isActive = false"
-    @focusin="isActive = true"
-    @focusout="isActive = false"
-  >
+  <div class="stack-scene" role="img" aria-label="Animated full stack pipeline: Front-End, Back-End, Database">
+    <!-- Ambient glow -->
+    <div class="stack-scene__ambient" aria-hidden="true" />
+
     <svg
-      class="stack-svg"
-      viewBox="0 0 200 300"
+      class="stack-scene__svg"
+      viewBox="0 0 320 380"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id="dbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#6C63FF" />
-          <stop offset="50%" stop-color="#2DD4BF" />
-          <stop offset="100%" stop-color="#6C63FF" />
-        </linearGradient>
-        <linearGradient id="platTop" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#1e2440" />
+        <linearGradient :id="`${uid}-plat`" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#252d4a" />
           <stop offset="100%" stop-color="#141829" />
         </linearGradient>
-        <filter id="glowPurple" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
+        <linearGradient :id="`${uid}-side`" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#1a2038" />
+          <stop offset="100%" stop-color="#0c0f1a" />
+        </linearGradient>
+        <linearGradient :id="`${uid}-db`" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#8b83ff">
+            <animate attributeName="stop-color" values="#8b83ff;#2dd4bf;#8b83ff" dur="4s" repeatCount="indefinite" />
+          </stop>
+          <stop offset="50%" stop-color="#6C63FF">
+            <animate attributeName="stop-color" values="#6C63FF;#14b8a6;#6C63FF" dur="4s" repeatCount="indefinite" />
+          </stop>
+          <stop offset="100%" stop-color="#4a3f9f">
+            <animate attributeName="stop-color" values="#4a3f9f;#0d9488;#4a3f9f" dur="4s" repeatCount="indefinite" />
+          </stop>
+        </linearGradient>
+        <linearGradient :id="`${uid}-beam`" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#6C63FF" stop-opacity="0" />
+          <stop offset="50%" stop-color="#2dd4bf" stop-opacity="1" />
+          <stop offset="100%" stop-color="#6C63FF" stop-opacity="0" />
+        </linearGradient>
+        <filter :id="`${uid}-glow`" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="4" result="b" />
           <feMerge>
-            <feMergeNode in="blur" />
+            <feMergeNode in="b" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <filter id="glowTeal" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
+        <filter :id="`${uid}-soft`" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="8" result="b" />
+          <feMerge><feMergeNode in="b" /></feMerge>
         </filter>
+
+        <!-- Motion paths for data packets -->
+        <path :id="`${uid}-p1`" d="M 78 88 L 78 168" />
+        <path :id="`${uid}-p2`" d="M 242 88 L 242 168" />
+        <path :id="`${uid}-p3`" d="M 78 188 L 78 268" />
+        <path :id="`${uid}-p4`" d="M 242 188 L 242 268" />
+        <path :id="`${uid}-p5`" d="M 160 70 L 160 290" />
+        <path :id="`${uid}-p6`" d="M 160 290 L 160 70" />
       </defs>
 
-      <!-- Corner connectors (dashed pillars) -->
-      <g class="stack-connectors">
-        <line class="stack-connector stack-connector--1" x1="52" y1="72" x2="52" y2="128" />
-        <line class="stack-connector stack-connector--2" x1="148" y1="72" x2="148" y2="128" />
-        <line class="stack-connector stack-connector--3" x1="52" y1="138" x2="52" y2="194" />
-        <line class="stack-connector stack-connector--4" x1="148" y1="138" x2="148" y2="194" />
+      <!-- Background grid -->
+      <g class="stack-grid" opacity="0.15">
+        <line v-for="i in 9" :key="`gh-${i}`" :x1="i * 36" y1="0" :x2="i * 36" y2="380" stroke="#6C63FF" stroke-width="0.5" />
+        <line v-for="i in 11" :key="`gv-${i}`" x1="0" :y1="i * 36" x2="320" :y2="i * 36" stroke="#6C63FF" stroke-width="0.5" />
       </g>
 
-      <!-- Flow particles down the pillars -->
-      <g class="stack-flow">
-        <g class="stack-particle stack-particle--1"><circle cx="52" cy="72" r="3" fill="#9b87ff" /></g>
-        <g class="stack-particle stack-particle--2"><circle cx="148" cy="72" r="3" fill="#9b87ff" /></g>
-        <g class="stack-particle stack-particle--3"><circle cx="52" cy="138" r="3" fill="#2dd4bf" /></g>
-        <g class="stack-particle stack-particle--4"><circle cx="148" cy="138" r="3" fill="#2dd4bf" /></g>
-      </g>
+      <!-- Orbital ring -->
+      <ellipse
+        cx="160" cy="190" rx="130" ry="48"
+        fill="none" stroke="#6C63FF" stroke-width="0.8" opacity="0.2"
+        stroke-dasharray="8 12"
+      >
+        <animateTransform attributeName="transform" type="rotate" from="0 160 190" to="360 160 190" dur="24s" repeatCount="indefinite" />
+      </ellipse>
 
-      <!-- ── Layer 1: Front-End ── -->
-      <g class="stack-layer stack-layer--fe">
-        <!-- Platform -->
-        <path class="stack-plat-side" d="M52,72 L100,96 L100,108 L52,84 Z" />
-        <path class="stack-plat-side" d="M148,72 L100,96 L100,108 L148,84 Z" />
-        <path class="stack-plat-top" d="M52,72 L100,48 L148,72 L100,96 Z" />
-        <!-- Code icon -->
-        <g class="stack-icon stack-icon--code" filter="url(#glowPurple)">
-          <text x="100" y="78" text-anchor="middle" fill="#9b87ff" font-size="22" font-weight="bold" font-family="monospace">&lt;/&gt;</text>
+      <!-- Soft center glow -->
+      <ellipse cx="160" cy="190" rx="70" ry="90" :fill="`url(#${uid}-beam)`" opacity="0.12" :filter="`url(#${uid}-soft)`">
+        <animate attributeName="opacity" values="0.08;0.18;0.08" dur="3s" repeatCount="indefinite" />
+        <animate attributeName="ry" values="85;95;85" dur="3s" repeatCount="indefinite" />
+      </ellipse>
+
+      <!-- Floating stack group -->
+      <g class="stack-float">
+        <!-- Corner pillars -->
+        <g class="stack-pillars">
+          <line x1="78" y1="88" x2="78" y2="168" class="stack-pillar" />
+          <line x1="242" y1="88" x2="242" y2="168" class="stack-pillar" />
+          <line x1="78" y1="188" x2="78" y2="268" class="stack-pillar" />
+          <line x1="242" y1="188" x2="242" y2="268" class="stack-pillar" />
         </g>
-      </g>
 
-      <!-- ── Layer 2: Back-End ── -->
-      <g class="stack-layer stack-layer--be">
-        <path class="stack-plat-side" d="M52,138 L100,162 L100,174 L52,150 Z" />
-        <path class="stack-plat-side" d="M148,138 L100,162 L100,174 L148,150 Z" />
-        <path class="stack-plat-top" d="M52,138 L100,114 L148,138 L100,162 Z" />
-        <!-- Server chips -->
-        <g class="stack-icon stack-icon--server">
-          <rect x="78" y="142" width="18" height="10" rx="2" fill="#2a3050" stroke="#6C63FF" stroke-width="0.8" opacity="0.9" />
-          <rect x="104" y="142" width="18" height="10" rx="2" fill="#2a3050" stroke="#6C63FF" stroke-width="0.8" opacity="0.9" />
-          <rect x="91" y="128" width="18" height="10" rx="2" fill="#2a3050" stroke="#2DD4BF" stroke-width="0.8" opacity="0.7" />
-          <circle cx="84" cy="147" r="1.5" fill="#2DD4BF" />
-          <circle cx="111" cy="147" r="1.5" fill="#2DD4BF" />
-          <circle cx="97" cy="133" r="1.5" fill="#6C63FF" />
+        <!-- Data packets — always moving -->
+        <g class="stack-packets">
+          <circle r="4" fill="#9b87ff" filter="url(#svc-glow)">
+            <animateMotion dur="2.2s" repeatCount="indefinite" :href="`#${uid}-p1`" />
+            <animate attributeName="opacity" values="0;1;1;0" dur="2.2s" repeatCount="indefinite" />
+          </circle>
+          <circle r="3.5" fill="#2dd4bf" filter="url(#svc-glow)">
+            <animateMotion dur="2.2s" begin="0.4s" repeatCount="indefinite" :href="`#${uid}-p2`" />
+            <animate attributeName="opacity" values="0;1;1;0" dur="2.2s" begin="0.4s" repeatCount="indefinite" />
+          </circle>
+          <circle r="4" fill="#6C63FF" filter="url(#svc-glow)">
+            <animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite" :href="`#${uid}-p3`" />
+            <animate attributeName="opacity" values="0;1;1;0" dur="2.4s" begin="0.8s" repeatCount="indefinite" />
+          </circle>
+          <circle r="3.5" fill="#2dd4bf" filter="url(#svc-glow)">
+            <animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" :href="`#${uid}-p4`" />
+            <animate attributeName="opacity" values="0;1;1;0" dur="2.4s" begin="1.2s" repeatCount="indefinite" />
+          </circle>
+          <!-- Center spine down -->
+          <circle r="5" fill="#c4b5fd" filter="url(#svc-glow)">
+            <animateMotion dur="3s" repeatCount="indefinite" :href="`#${uid}-p5`" />
+            <animate attributeName="r" values="4;6;4" dur="3s" repeatCount="indefinite" />
+          </circle>
+          <!-- Response traveling back up -->
+          <circle r="4" fill="#2dd4bf" opacity="0.9" filter="url(#svc-glow)">
+            <animateMotion dur="3.5s" begin="1.5s" repeatCount="indefinite" :href="`#${uid}-p6`" />
+          </circle>
+          <circle r="2.5" fill="#fff" opacity="0.7">
+            <animateMotion dur="1.8s" begin="0.6s" repeatCount="indefinite" :href="`#${uid}-p1`" />
+          </circle>
+          <circle r="2.5" fill="#fff" opacity="0.7">
+            <animateMotion dur="1.8s" begin="1.1s" repeatCount="indefinite" :href="`#${uid}-p3`" />
+          </circle>
         </g>
-      </g>
 
-      <!-- ── Layer 3: Database ── -->
-      <g class="stack-layer stack-layer--db">
-        <path class="stack-plat-side" d="M52,204 L100,228 L100,240 L52,216 Z" />
-        <path class="stack-plat-side" d="M148,204 L100,228 L100,240 L148,216 Z" />
-        <path class="stack-plat-top" d="M52,204 L100,180 L148,204 L100,228 Z" />
-        <!-- Cylinder database -->
-        <g class="stack-icon stack-icon--db" filter="url(#glowTeal)">
-          <ellipse cx="100" cy="198" rx="22" ry="7" fill="url(#dbGrad)" opacity="0.95" />
-          <path d="M78,198 L78,218 Q100,228 122,218 L122,198 Q100,208 78,198" fill="url(#dbGrad)" />
-          <ellipse cx="100" cy="218" rx="22" ry="7" fill="#4a3f9f" opacity="0.8" />
-          <ellipse cx="100" cy="198" rx="22" ry="7" fill="none" stroke="#9b87ff" stroke-width="1" opacity="0.5" />
-          <line x1="78" y1="206" x2="122" y2="206" stroke="rgba(255,255,255,0.15)" stroke-width="0.8" />
-          <line x1="78" y1="212" x2="122" y2="212" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" />
+        <!-- Scan line -->
+        <line x1="60" y1="80" x2="260" y2="80" stroke="#2dd4bf" stroke-width="1" opacity="0">
+          <animate attributeName="y1" values="80;280;80" dur="4s" repeatCount="indefinite" />
+          <animate attributeName="y2" values="80;280;80" dur="4s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0;0.35;0" dur="4s" repeatCount="indefinite" />
+        </line>
+
+        <!-- ═══ LAYER 1: Front-End ═══ -->
+        <g class="stack-layer stack-layer--fe">
+          <path :fill="`url(#${uid}-side)`" d="M78,88 L160,128 L160,142 L78,102 Z" stroke="rgba(108,99,255,0.2)" stroke-width="0.6" />
+          <path :fill="`url(#${uid}-side)`" d="M242,88 L160,128 L160,142 L242,102 Z" stroke="rgba(108,99,255,0.2)" stroke-width="0.6" />
+          <path :fill="`url(#${uid}-plat)`" d="M78,88 L160,48 L242,88 L160,128 Z" stroke="#6C63FF" stroke-width="1" class="stack-plat-glow" />
+          <!-- Code brackets animated -->
+          <g :filter="`url(#${uid}-glow)`">
+            <text x="160" y="92" text-anchor="middle" fill="#c4b5fd" font-size="28" font-weight="bold" font-family="monospace" class="stack-code">
+              &lt;/&gt;
+            </text>
+          </g>
+          <!-- Mini UI bars -->
+          <rect x="130" y="100" width="24" height="3" rx="1.5" fill="#6C63FF" opacity="0.6">
+            <animate attributeName="width" values="16;28;16" dur="2s" repeatCount="indefinite" />
+          </rect>
+          <rect x="138" y="108" width="16" height="2" rx="1" fill="rgba(255,255,255,0.2)">
+            <animate attributeName="opacity" values="0.1;0.4;0.1" dur="1.5s" repeatCount="indefinite" />
+          </rect>
         </g>
+
+        <!-- ═══ LAYER 2: Back-End ═══ -->
+        <g class="stack-layer stack-layer--be">
+          <path :fill="`url(#${uid}-side)`" d="M78,188 L160,228 L160,242 L78,202 Z" stroke="rgba(45,212,191,0.15)" stroke-width="0.6" />
+          <path :fill="`url(#${uid}-side)`" d="M242,188 L160,228 L160,242 L242,202 Z" stroke="rgba(45,212,191,0.15)" stroke-width="0.6" />
+          <path :fill="`url(#${uid}-plat)`" d="M78,188 L160,148 L242,188 L160,228 Z" stroke="#2dd4bf" stroke-width="0.8" class="stack-plat-glow stack-plat-glow--teal" />
+          <!-- Server rack -->
+          <g class="stack-server">
+            <rect x="118" y="168" width="36" height="14" rx="3" fill="#1a2038" stroke="#6C63FF" stroke-width="0.8" />
+            <rect x="118" y="186" width="36" height="14" rx="3" fill="#1a2038" stroke="#2dd4bf" stroke-width="0.8" />
+            <rect x="148" y="177" width="28" height="12" rx="2" fill="#1a2038" stroke="#6C63FF" stroke-width="0.6" opacity="0.85" />
+            <!-- Blinking LEDs -->
+            <circle cx="124" cy="175" r="2" fill="#2dd4bf">
+              <animate attributeName="opacity" values="1;0.2;1" dur="0.8s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="132" cy="175" r="2" fill="#6C63FF">
+              <animate attributeName="opacity" values="0.2;1;0.2" dur="0.8s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="124" cy="193" r="2" fill="#fbbf24">
+              <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite" />
+            </circle>
+            <!-- Activity bars -->
+            <rect x="152" y="181" width="4" height="6" fill="#2dd4bf" opacity="0.7">
+              <animate attributeName="height" values="3;8;3" dur="0.6s" repeatCount="indefinite" />
+              <animate attributeName="y" values="184;179;184" dur="0.6s" repeatCount="indefinite" />
+            </rect>
+            <rect x="159" y="181" width="4" height="6" fill="#6C63FF" opacity="0.7">
+              <animate attributeName="height" values="5;9;5" dur="0.5s" begin="0.1s" repeatCount="indefinite" />
+              <animate attributeName="y" values="182;178;182" dur="0.5s" begin="0.1s" repeatCount="indefinite" />
+            </rect>
+            <rect x="166" y="181" width="4" height="6" fill="#2dd4bf" opacity="0.7">
+              <animate attributeName="height" values="2;7;2" dur="0.7s" begin="0.2s" repeatCount="indefinite" />
+              <animate attributeName="y" values="185;180;185" dur="0.7s" begin="0.2s" repeatCount="indefinite" />
+            </rect>
+          </g>
+        </g>
+
+        <!-- ═══ LAYER 3: Database ═══ -->
+        <g class="stack-layer stack-layer--db">
+          <path :fill="`url(#${uid}-side)`" d="M78,268 L160,308 L160,322 L78,282 Z" stroke="rgba(108,99,255,0.15)" stroke-width="0.6" />
+          <path :fill="`url(#${uid}-side)`" d="M242,268 L160,308 L160,322 L242,282 Z" stroke="rgba(108,99,255,0.15)" stroke-width="0.6" />
+          <path :fill="`url(#${uid}-plat)`" d="M78,268 L160,228 L242,268 L160,308 Z" stroke="#6C63FF" stroke-width="0.8" class="stack-plat-glow" />
+          <!-- Database cylinder -->
+          <g :filter="`url(#${uid}-glow)`" class="stack-db-cylinder">
+            <ellipse cx="160" cy="258" rx="32" ry="10" :fill="`url(#${uid}-db)`" />
+            <path :d="`M128,258 L128,288 Q160,302 192,288 L192,258 Q160,272 128,258`" :fill="`url(#${uid}-db)`" />
+            <ellipse cx="160" cy="288" rx="32" ry="10" fill="#3d3480" opacity="0.9" />
+            <ellipse cx="160" cy="258" rx="32" ry="10" fill="none" stroke="#c4b5fd" stroke-width="1" opacity="0.6">
+              <animate attributeName="stroke-opacity" values="0.3;0.9;0.3" dur="2s" repeatCount="indefinite" />
+            </ellipse>
+            <line x1="128" y1="268" x2="192" y2="268" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" />
+            <line x1="128" y1="278" x2="192" y2="278" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" />
+            <!-- Data ring -->
+            <ellipse cx="160" cy="273" rx="38" ry="14" fill="none" stroke="#2dd4bf" stroke-width="0.6" opacity="0.4" stroke-dasharray="4 6">
+              <animateTransform attributeName="transform" type="rotate" from="0 160 273" to="360 160 273" dur="8s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+        </g>
+
+        <!-- Center spine -->
+        <line x1="160" y1="70" x2="160" y2="300" stroke="url(#svc-beam)" stroke-width="2" stroke-dasharray="6 8" opacity="0.5">
+          <animate attributeName="stroke-dashoffset" values="0;-28" dur="1s" repeatCount="indefinite" />
+        </line>
       </g>
 
-      <!-- End-to-end path overlay -->
-      <path
-        class="stack-e2e-path"
-        d="M100,60 L100,155 L100,210"
-        fill="none"
-        stroke="#6C63FF"
-        stroke-width="1.5"
-        stroke-dasharray="160"
-        stroke-dashoffset="160"
-        opacity="0"
-      />
+      <!-- Floating ambient particles -->
+      <g class="stack-ambient-dots">
+        <circle v-for="(d, i) in 12" :key="i" :cx="30 + (i * 23) % 260" :cy="40 + (i * 31) % 300" r="1.5" fill="#6C63FF" opacity="0.3">
+          <animate attributeName="cy" :values="`${40 + (i * 31) % 300};${30 + (i * 31) % 300};${40 + (i * 31) % 300}`" :dur="`${3 + i * 0.4}s`" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.1;0.5;0.1" :dur="`${2 + i * 0.3}s`" repeatCount="indefinite" />
+        </circle>
+      </g>
     </svg>
 
-    <!-- Step labels -->
-    <div class="stack-steps">
-      <div
-        v-for="(step, i) in steps"
-        :key="step.id"
-        class="stack-step"
-        :class="`stack-step--${step.id}`"
-        :style="{ animationDelay: `${i * 0.6}s` }"
-      >
-        <span class="stack-step__num">{{ i + 1 }}</span>
-        <div>
-          <p class="stack-step__label">{{ step.label }}</p>
-          <p class="stack-step__desc">{{ step.desc }}</p>
-        </div>
-      </div>
+    <!-- Live pipeline status -->
+    <div class="stack-pipeline">
+      <span class="stack-pipeline__dot" />
+      <span class="stack-pipeline__label">Live pipeline</span>
+      <span class="stack-pipeline__phase">{{ phases[pipelinePhase] }}</span>
     </div>
 
-    <p class="stack-hint">
-      <span class="stack-hint__icon">↕</span>
-      Hover to see end-to-end flow
-    </p>
+    <div class="stack-flow-labels">
+      <span class="stack-flow-label stack-flow-label--1">Front-End</span>
+      <span class="stack-flow-label stack-flow-label--2">Back-End</span>
+      <span class="stack-flow-label stack-flow-label--3">Database</span>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.stack-visual {
+.stack-scene {
+  position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  cursor: default;
-  outline: none;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
 }
 
-.stack-svg {
+.stack-scene__ambient {
+  position: absolute;
+  inset: 10% 5%;
+  background: radial-gradient(ellipse at 50% 45%, rgba(108, 99, 255, 0.2) 0%, transparent 65%);
+  animation: ambient-pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.stack-scene__svg {
   width: 100%;
-  max-width: 260px;
+  max-width: 300px;
   height: auto;
   display: block;
+  position: relative;
+  z-index: 1;
 }
 
-/* Platform surfaces */
-.stack-plat-top {
-  fill: url(#platTop);
-  stroke: rgba(108, 99, 255, 0.25);
-  stroke-width: 0.8;
-  transition: stroke 0.4s, filter 0.4s;
+.stack-float {
+  animation: stack-float 5s ease-in-out infinite;
+  transform-origin: 160px 190px;
 }
 
-.stack-plat-side {
-  fill: #0f1320;
-  stroke: rgba(108, 99, 255, 0.12);
-  stroke-width: 0.5;
+.stack-pillar {
+  stroke: rgba(108, 99, 255, 0.35);
+  stroke-width: 1.2;
+  stroke-dasharray: 6 6;
+  animation: pillar-march 1.2s linear infinite;
 }
 
-/* Corner connectors */
-.stack-connector {
-  stroke: rgba(108, 99, 255, 0.25);
-  stroke-width: 1;
-  stroke-dasharray: 4 4;
-  transition: stroke 0.3s;
+.stack-plat-glow {
+  animation: plat-pulse-purple 3s ease-in-out infinite;
 }
 
-.stack-particle {
-  opacity: 0;
+.stack-plat-glow--teal {
+  animation: plat-pulse-teal 3s ease-in-out infinite;
+  animation-delay: 1s;
 }
 
-/* Layer defaults */
-.stack-layer {
-  transition: filter 0.4s;
+.stack-code {
+  animation: code-glow 2s ease-in-out infinite;
 }
 
-.stack-icon--code text {
-  transition: fill 0.3s;
+.stack-layer--fe {
+  animation: layer-glow-fe 4s ease-in-out infinite;
 }
 
-/* ── Hover / active animations ── */
-.stack-visual--active .stack-connector {
-  stroke: rgba(108, 99, 255, 0.55);
-  animation: connector-march 0.8s linear infinite;
+.stack-layer--be {
+  animation: layer-glow-be 4s ease-in-out infinite;
+  animation-delay: 1.3s;
 }
 
-.stack-visual--active .stack-particle {
-  opacity: 1;
-  animation: particle-down 2.4s ease-in-out infinite;
+.stack-layer--db {
+  animation: layer-glow-db 4s ease-in-out infinite;
+  animation-delay: 2.6s;
 }
 
-.stack-visual--active .stack-particle--1 { animation-delay: 0s; }
-.stack-visual--active .stack-particle--2 { animation-delay: 0.15s; }
-.stack-visual--active .stack-particle--3 { animation-delay: 0.8s; }
-.stack-visual--active .stack-particle--4 { animation-delay: 0.95s; }
-
-.stack-visual--active .stack-layer--fe {
-  animation: layer-pulse-fe 2.4s ease-in-out infinite;
+.stack-db-cylinder {
+  animation: db-breathe 3s ease-in-out infinite;
+  transform-origin: 160px 273px;
 }
 
-.stack-visual--active .stack-layer--be {
-  animation: layer-pulse-be 2.4s ease-in-out infinite;
-}
-
-.stack-visual--active .stack-layer--db {
-  animation: layer-pulse-db 2.4s ease-in-out infinite;
-}
-
-.stack-visual--active .stack-e2e-path {
-  opacity: 0.5;
-  animation: e2e-draw 2.4s ease-in-out infinite;
-}
-
-.stack-visual--active .stack-icon--code text {
-  fill: #c4b5fd;
-}
-
-.stack-visual--active .stack-step {
-  animation: step-highlight 2.4s ease-in-out infinite;
-}
-
-.stack-visual--active .stack-step--fe { animation-delay: 0s; }
-.stack-visual--active .stack-step--be { animation-delay: 0.8s; }
-.stack-visual--active .stack-step--db { animation-delay: 1.6s; }
-
-.stack-visual--active .stack-hint {
-  opacity: 0;
-}
-
-/* Step labels */
-.stack-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  width: 100%;
-}
-
-.stack-step {
+/* Pipeline status bar */
+.stack-pipeline {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.45rem 0.65rem;
-  border-radius: 8px;
-  background: rgba(108, 99, 255, 0.06);
-  border: 1px solid transparent;
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.stack-step__num {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(108, 99, 255, 0.15);
-  color: #9b87ff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.stack-step__label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.2;
-}
-
-.stack-step__desc {
-  font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.45);
-  line-height: 1.2;
-}
-
-.stack-hint {
+  gap: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  background: rgba(108, 99, 255, 0.12);
+  border: 1px solid rgba(108, 99, 255, 0.25);
+  border-radius: 999px;
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.35);
+  z-index: 2;
+}
+
+.stack-pipeline__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2dd4bf;
+  box-shadow: 0 0 8px #2dd4bf;
+  animation: live-blink 1s ease-in-out infinite;
+}
+
+.stack-pipeline__label {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.stack-pipeline__phase {
+  color: #c4b5fd;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  min-width: 90px;
+  animation: phase-fade 0.4s ease;
+}
+
+.stack-flow-labels {
   display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  transition: opacity 0.3s;
-  margin-top: -0.25rem;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 280px;
+  padding: 0 0.25rem;
 }
 
-.stack-hint__icon {
-  color: #6C63FF;
-  animation: hint-bounce 2s ease-in-out infinite;
+.stack-flow-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  animation: label-cycle 4s ease-in-out infinite;
 }
 
-/* Keyframes */
-@keyframes connector-march {
-  to { stroke-dashoffset: -16; }
-}
+.stack-flow-label--1 { animation-delay: 0s; }
+.stack-flow-label--2 { animation-delay: 1.3s; }
+.stack-flow-label--3 { animation-delay: 2.6s; }
 
-@keyframes particle-down {
-  0% { transform: translateY(0); opacity: 0; }
-  8% { opacity: 1; }
-  42% { transform: translateY(66px); opacity: 1; }
-  52% { transform: translateY(66px); opacity: 0.4; }
-  88% { transform: translateY(126px); opacity: 1; }
-  100% { transform: translateY(126px); opacity: 0; }
-}
-
-@keyframes layer-pulse-fe {
-  0%, 100% { filter: none; }
-  5%, 30% { filter: drop-shadow(0 0 10px rgba(108, 99, 255, 0.7)); }
-  35% { filter: none; }
-}
-
-@keyframes layer-pulse-be {
-  0%, 30%, 100% { filter: none; }
-  38%, 58% { filter: drop-shadow(0 0 10px rgba(45, 212, 191, 0.6)); }
-}
-
-@keyframes layer-pulse-db {
-  0%, 60%, 100% { filter: none; }
-  68%, 88% { filter: drop-shadow(0 0 12px rgba(108, 99, 255, 0.8)); }
-}
-
-@keyframes e2e-draw {
-  0% { stroke-dashoffset: 160; opacity: 0; }
-  10% { opacity: 0.5; }
-  90% { stroke-dashoffset: 0; opacity: 0.5; }
-  100% { stroke-dashoffset: 0; opacity: 0; }
-}
-
-@keyframes step-highlight {
-  0%, 100% {
-    background: rgba(108, 99, 255, 0.06);
-    border-color: transparent;
-  }
-  5%, 30% {
-    background: rgba(108, 99, 255, 0.18);
-    border-color: rgba(108, 99, 255, 0.4);
-  }
-}
-
-@keyframes hint-bounce {
+@keyframes stack-float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(3px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pillar-march {
+  to { stroke-dashoffset: -24; }
+}
+
+@keyframes plat-pulse-purple {
+  0%, 100% { stroke-opacity: 0.4; }
+  50% { stroke-opacity: 1; }
+}
+
+@keyframes plat-pulse-teal {
+  0%, 100% { stroke-opacity: 0.4; }
+  50% { stroke-opacity: 1; }
+}
+
+@keyframes code-glow {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+@keyframes layer-glow-fe {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(108, 99, 255, 0.2)); }
+  25% { filter: drop-shadow(0 0 16px rgba(108, 99, 255, 0.7)); }
+  50%, 100% { filter: drop-shadow(0 0 4px rgba(108, 99, 255, 0.2)); }
+}
+
+@keyframes layer-glow-be {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(45, 212, 191, 0.2)); }
+  25% { filter: drop-shadow(0 0 16px rgba(45, 212, 191, 0.6)); }
+}
+
+@keyframes layer-glow-db {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(108, 99, 255, 0.2)); }
+  25% { filter: drop-shadow(0 0 18px rgba(139, 131, 255, 0.8)); }
+}
+
+@keyframes db-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.04); }
+}
+
+@keyframes ambient-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes live-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes label-cycle {
+  0%, 100% { color: rgba(255, 255, 255, 0.35); }
+  20%, 35% { color: #c4b5fd; }
+}
+
+@keyframes phase-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack-float,
+  .stack-pillar,
+  .stack-plat-glow,
+  .stack-layer--fe,
+  .stack-layer--be,
+  .stack-layer--db,
+  .stack-db-cylinder,
+  .stack-scene__ambient,
+  .stack-pipeline__dot,
+  .stack-flow-label {
+    animation: none !important;
+  }
 }
 </style>
