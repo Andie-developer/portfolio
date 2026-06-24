@@ -109,15 +109,26 @@ const layerColors = {
 }
 
 .services__visual-card {
-  background: linear-gradient(165deg, #0b0d17 0%, #12162a 100%);
-  border: 1px solid rgba(108, 99, 255, 0.2);
+  background: linear-gradient(165deg, #07090f 0%, #0f1320 50%, #12162a 100%);
+  border: 1px solid rgba(108, 99, 255, 0.25);
   border-radius: 16px;
-  padding: 1.5rem 1.25rem;
+  padding: 1.25rem 1rem 1rem;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.15),
-    0 0 40px rgba(108, 99, 255, 0.08);
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 0 60px rgba(108, 99, 255, 0.12);
   width: 100%;
-  max-width: 340px;
+  max-width: 360px;
+  overflow: hidden;
+  position: relative;
+}
+
+.services__visual-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(108, 99, 255, 0.08) 0%, transparent 55%);
+  pointer-events: none;
 }
 
 .services__grid {
