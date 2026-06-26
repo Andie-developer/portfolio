@@ -8,7 +8,7 @@
     "start": "vite",
     "serve": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --base /portfolio/"
   },
   "dependencies": {
     "lucide-vue-next": "^0.460.0",
