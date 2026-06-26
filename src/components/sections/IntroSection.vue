@@ -11,6 +11,7 @@ import {
 } from 'lucide-vue-next'
 import TechBadge from '../ui/TechBadge.vue'
 import AboutTechBg from '../ui/AboutTechBg.vue'
+import { asset } from '../../utils/asset.js'
 import { SITE, ABOUT, INTRO_TECH } from '../../utils/constants.js'
 
 const iconMap = {
@@ -38,7 +39,7 @@ function scrollTo(id) {
           <div class="about__photo-card">
             <div class="about__photo-frame">
               <img
-                src="/images/profile.png"
+                :src="asset('images/profile.png')"
                 :alt="`${SITE.shortName} — Software Developer`"
                 class="about__photo"
                 width="380"

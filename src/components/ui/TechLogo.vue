@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { asset } from '../../utils/asset.js'
 
 const props = defineProps({
   name: { type: String, required: true },
@@ -7,17 +8,20 @@ const props = defineProps({
 })
 
 const ICON_FILES = {
-  HTML: '/icons/html5.svg',
-  CSS: '/icons/css3.svg',
-  JavaScript: '/icons/javascript.svg',
-  'Vue.js': '/icons/vuejs.svg',
-  'Node.js': '/icons/nodejs.svg',
-  'C#': '/icons/csharp.svg',
-  'ASP.NET': '/icons/dotnet.svg',
-  Firebase: '/icons/firebase.svg',
+  HTML: 'icons/html5.svg',
+  CSS: 'icons/css3.svg',
+  JavaScript: 'icons/javascript.svg',
+  'Vue.js': 'icons/vuejs.svg',
+  'Node.js': 'icons/nodejs.svg',
+  'C#': 'icons/csharp.svg',
+  'ASP.NET': 'icons/dotnet.svg',
+  Firebase: 'icons/firebase.svg',
 }
 
-const src = computed(() => ICON_FILES[props.name] || '')
+const src = computed(() => {
+  const file = ICON_FILES[props.name]
+  return file ? asset(file) : ''
+})
 const isWide = computed(() => props.name === 'Node.js' || props.name === 'ASP.NET')
 </script>
 
